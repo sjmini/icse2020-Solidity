@@ -47,15 +47,14 @@ case object InhCheck extends PhaseObj[Unit, InhCheckConfig, Unit] {
       val extension = List("sol")
 
       //HSJ
-      val files = getListOfFiles(new File("/Users/sungjaehwang/blockchain/emperical/data/merge_source_destruct_remove"), extension)
-
-      val files_throw = getListOfFiles(new File("/Users/sungjaehwang/blockchain/emperical/data/deprecated/413"), extension)
-      val files_sucide = getListOfFiles(new File("/Users/sungjaehwang/blockchain/emperical/data/deprecated/417"), extension)
-      val files_block = getListOfFiles(new File("/Users/sungjaehwang/blockchain/emperical/data/deprecated/422"), extension)
-      val files_callcode = getListOfFiles(new File("/Users/sungjaehwang/blockchain/emperical/data/deprecated/412"), extension)
-      val files_sha3 = getListOfFiles(new File("/Users/sungjaehwang/blockchain/emperical/data/deprecated/417"), extension)
-      val files_gas = getListOfFiles(new File("/Users/sungjaehwang/blockchain/emperical/data/deprecated/421"), extension)
-      val files_order = getListOfFiles(new File("/Users/sungjaehwang/blockchain/emperical/data/ordering_source"), extension)
+      val files = getListOfFiles(new File("test/live"), extension)
+      val files_throw = getListOfFiles(new File("test/413"), extension)
+      val files_sucide = getListOfFiles(new File("test/417"), extension)
+      val files_block = getListOfFiles(new File("test/422"), extension)
+      val files_callcode = getListOfFiles(new File("test/412"), extension)
+      val files_sha3 = getListOfFiles(new File("test/417"), extension)
+      val files_gas = getListOfFiles(new File("test/421"), extension)
+      val files_order = getListOfFiles(new File("test/ordering_source"), extension)
 
       val writer_type_address = new PrintWriter(new FileOutputStream(new File("type_result_address.txt"), false))
       val writer_type_object = new PrintWriter(new FileOutputStream(new File("type_result_object.txt"), false))
