@@ -1,0 +1,424 @@
+/**
+ * *****************************************************************************
+ * Copyright (c) 2018, KAIST.
+ * All rights reserved.
+ *
+ * Use is subject to license terms.
+ *
+ * This distribution may include materials developed by third parties.
+ * ****************************************************************************
+ */
+
+/*
+ * Definition of Solidity statements
+ */
+module kr.ac.kaist.saf.parser.Statement(Declaration, Expression, Literal, Symbol,
+                                        Identifier, Keyword, Spacing);
+
+import Declaration;
+import Expression;
+import Literal;
+import Symbol;
+import Identifier;
+import Keyword;
+import Spacing;
+
+/*
+ * Block ::= opencurly (w Statement)* w closecurly
+ */
+transient List<Statement> Block =
+     opencurly w closecurly
+     { yyValue = list(); }
+   / opencurly w a1:Statement a2s:(w Statement)* w closecurly
+     { yyValue = cons(a1, a2s.list()); };
+
+/*
+ * Statement ::=
+ *   EXTENSION: function (w Id)? w Params (w FtnMods)? (w returns w Params)? w equals w Statement
+ * | if w openparen w Expression w closeparen w Statement (w else w Statement)?
+ * | while w openparen w Expression w closeparen w Statement
+ * | for w openparen (w SimpleStatement)? w semicolon (w Expression)?
+ *   w semicolon (w ExpressionStatement)? (w semicolon)? w closeparen w Statement
+ *   EXTENSION: the third optional semicolon
+ * | Block
+ * | assembly (w StringLiteral)? w InlineAssemblyBlock
+ * | do w Statement w while w openparen w Expression w closeparen w semicolon
+ * | continue w semicolon
+ * | break w semicolon
+ * | return (w Expression)? w semicolon
+ * | throw w semicolon
+ * | emit w FunctionCall w semicolon
+ * | SimpleStatement w semicolon
+ * | EXTENSION: underscore (w semicolon)?
+ */
+Statement Statement =
+     function a1:(w Id)? w a2:Params a3:(w FtnMods)? a4:(w returns w Params)? w equals w a5:Statement
+     { ASTNodeInfo info = NodeUtil.makeASTNodeInfo(createSpan(yyStart,yyCount));
+       Option<Id> name;
+       if (a1 == null) name = Option.<Id>apply(null);
+       else name = Some.<Id>apply(a1);
+       scala.collection.immutable.List<FtnMod> mods;
+       if (a3 == null) mods = nilFtnMods;
+       else mods = toList(a3);
+       scala.collection.immutable.List<Parameter> result;
+       if (a4 == null) result = nilParams;
+       else result = toList(a4);
+       yyValue = new FtnDefStmt(info, name, toList(a2), mods, result, a5);
+     }
+   / if w openparen w a1:Expression w closeparen w a2:Statement w else w a3:Statement
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new If(NodeUtil.makeASTNodeInfo(span), a1, a2, Some.<Statement>apply(a3));
+     }
+   / if w openparen w a1:Expression w closeparen w a2:Statement
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new If(NodeUtil.makeASTNodeInfo(span), a1, a2, Option.<Statement>apply(null));
+     }
+   / while w openparen w a1:Expression w closeparen w a2:Statement
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new While(NodeUtil.makeASTNodeInfo(span), a1, a2);
+     }
+   / for w openparen a1:(w SimpleStatement)? w semicolon a2:(w Expression)?
+     w semicolon a3:(w ExpressionStatement)? (w semicolon)? w closeparen w a4:Statement
+     { Span span = createSpan(yyStart,yyCount);
+       Option<SimpleStatement> init;
+       Option<Expression> test;
+       Option<Statement> update;
+       if (a1 == null) init = Option.<SimpleStatement>apply(null);
+       else            init = Some.<SimpleStatement>apply(a1);
+       if (a2 == null) test = Option.<Expression>apply(null);
+       else            test = Some.<Expression>apply(a2);
+       if (a3 == null) update = Option.<Statement>apply(null);
+       else            update = Some.<Statement>apply(a3);
+       yyValue = new For(NodeUtil.makeASTNodeInfo(span), init, test, update, a4);
+     }
+   / a1:Block
+     { Span span = createSpan(yyStart,yyCount+1);
+       yyValue = new ABlock(NodeUtil.makeASTNodeInfo(span), toList(a1));
+     }
+   / assembly a1:(w StringLiteral)? w a2:InlineAssemblyBlock
+     { Span span = createSpan(yyStart,yyCount+1);
+       Option<String> name;
+       if (a1 == null) name = Option.<String>apply(null);
+       else            name = Some.<String>apply(a1.str());
+       yyValue = new InlineAssembly(NodeUtil.makeASTNodeInfo(span), name, toList(a2));
+     }
+   / do w a1:Statement w while w openparen w a2:Expression w
+     closeparen w semicolon
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new DoWhile(NodeUtil.makeASTNodeInfo(span), a1, a2);
+     }
+   / continue w semicolon
+     { ASTNodeInfo info = NodeUtil.makeASTNodeInfo(createSpan(yyStart,yyCount));
+       yyValue = new Continue(info);
+     }
+   / break w semicolon
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new Break(NodeUtil.makeASTNodeInfo(span));
+     }
+   / return w a1:Expression w semicolon
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new Return(NodeUtil.makeASTNodeInfo(span), Some.<Expression>apply(a1));
+     }
+   / return w semicolon
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new Return(NodeUtil.makeASTNodeInfo(span), Option.<Expression>apply(null));
+     }
+   / throw w semicolon
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new Throw(NodeUtil.makeASTNodeInfo(span));
+     }
+   / emit w a1:CallExpression w semicolon
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new Emit(NodeUtil.makeASTNodeInfo(span), a1);
+     }
+   / yyValue:SimpleStatement w semicolon
+   / underscore (w semicolon)?
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new Underscore(NodeUtil.makeASTNodeInfo(span));
+     }
+   ;
+
+/*
+ * SimpleStatement ::=
+ *   EXTENSION: var w a1:OptIds w a2:InitBody
+ * | var w Id (w InitBody)?
+ * | VariableDeclaration (w InitBody)?
+ * | openparen (w VariableDeclarationList)? w closeparen (w InitBody)?
+ * | ExpressionStatement
+ */
+SimpleStatement SimpleStatement =
+     var w a1:OptIds w a2:InitBody
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new SimpleVarX(NodeUtil.makeASTNodeInfo(span), toList(a1), a2);
+     }
+   / var w a1:Id a2:(w InitBody)?
+     { Span span = createSpan(yyStart,yyCount);
+       Option<Expression> body;
+       if (a2 == null) body = Option.<Expression>apply(null);
+       else            body = Some.<Expression>apply(a2);
+       yyValue = new SimpleVar(NodeUtil.makeASTNodeInfo(span), a1, body);
+     }
+   / a1:VariableDeclaration a2:(w InitBody)?
+     { Span span = createSpan(yyStart,yyCount);
+       Option<Expression> body;
+       if (a2 == null) body = Option.<Expression>apply(null);
+       else            body = Some.<Expression>apply(a2);
+       yyValue = new VarDecl(NodeUtil.makeASTNodeInfo(span), toList(list(a1)), body);
+     }
+   / openparen a1:(w VariableDeclarationList)? w closeparen a2:(w InitBody)?
+     { Span span = createSpan(yyStart,yyCount);
+       scala.collection.immutable.List<VariableDeclaration> decs;
+       if (a1 == null) decs = nilVDs;
+       else            decs = toList(a1);
+       Option<Expression> body;
+       if (a2 == null) body = Option.<Expression>apply(null);
+       else            body = Some.<Expression>apply(a2);
+       yyValue = new VarDecl(NodeUtil.makeASTNodeInfo(span), decs, body);
+     }
+   / yyValue:ExpressionStatement;
+
+/*
+ * VariableDeclarationList ::= VariableDeclaration (w comma w VariableDeclaration)*
+ * EXTENSION!
+ */
+List<VariableDeclaration> VariableDeclarationList =
+     (comma w)* a1:VariableDeclaration a2s:(w void:(comma w)* VariableDeclaration)* (w comma)*
+     { yyValue = cons(a1, a2s.list()); };
+
+/* 
+ * InitBody ::= equals w Expression
+ */
+Expression InitBody = equals w yyValue:Expression ;
+
+/*
+ * ExpressionStatement ::= Expression
+ */
+ExprStmt ExpressionStatement =
+     a1:Expression
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new ExprStmt(NodeUtil.makeASTNodeInfo(span), a1);
+     };
+
+/*
+ * InlineAssemblyBlock ::= opencurly (w AssemblyItems)? w closecurly
+ */
+List<AssemblyItem> InlineAssemblyBlock =
+     opencurly w yyValue:AssemblyItems w closecurly
+   / opencurly w closecurly
+     { yyValue = Collections.<AssemblyItem>emptyList(); };
+
+/*
+ * AssemblyItems ::= AssemblyItem (w AssemblyItem)*
+ */
+List<AssemblyItem> AssemblyItems =
+     a1:AssemblyItem a2s:(w AssemblyItem)*
+     { yyValue = cons(a1, a2s.list()); };
+
+/*
+ * AssemblyItem ::=
+ *   InlineAssemblyBlock
+ * | AssemblyLocalBinding
+ * | EXTENSION: let w IdOrList w := w AssemblyExpression
+ * | EXTENSION: let w IdOrList (w := w FunctionalAssemblyExpression)?
+ * | EXTENSION: if w AssemblyExpression w InlineAssemblyBlock
+ * | EXTENSION: switch w AssemblyExpression (w AssemblyCase)* (w default w InlineAssemblyBlock)?
+ * | EXTENSION: function w Id w openparen (w Id)? w closeparen
+ *              (w "->" (w openparen w)? Id (w closeparen)?)? w InlineAssemblyBlock
+// Ignore (w "->" w openparen w Id w closeparen)?
+ * | EXTENSION: for w (InlineAssemblyBlock | AssemblyExpression) w AssemblyExpression
+ *              w (InlineAssemblyBlock | AssemblyExpression) w InlineAssemblyBlock
+ * | EXTENSION: Id w := w AssemblyExpression
+ * | Id w := w FunctionalAssemblyExpression
+ * | =: w Id
+ * | AssemblyLabel
+ * | NumberLiteral
+ * | HexLiteral
+ * | StringLiteral
+ * | EXTENSION: break
+ * | EXTENSION: continue
+ * | EXTENSION: assembly w Id w InlineAssemblyBlock
+ * | EXTENSION: AssemblyExpression
+ * | FunctionalAssemblyExpression
+ * | Identifier
+ */
+AssemblyItem AssemblyItem =
+     a1:InlineAssemblyBlock
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyBlock(NodeUtil.makeASTNodeInfo(span), toList(a1));
+     }
+   / let w a1:IdOrList w ":" w "=" w a2:AssemblyExpression
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyLetX(NodeUtil.makeASTNodeInfo(span), toList(a1), a2);
+     }
+   / let w a1:IdOrList a2:(w void:":" w void:"=" w FunctionalAssemblyExpression)?
+     { Span span = createSpan(yyStart,yyCount);
+       Option<FtnAssembly> body;
+       if (a2 == null) body = Option.<FtnAssembly>apply(null);
+       else            body = Some.<FtnAssembly>apply(a2);
+       yyValue = new AssemblyLet(NodeUtil.makeASTNodeInfo(span), toList(a1), body);
+     }
+   / if w a1:AssemblyExpression w a2:InlineAssemblyBlock
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyIf(NodeUtil.makeASTNodeInfo(span), a1, toList(a2));
+     }
+   / switch w a1:AssemblyExpression a2s:(w AssemblyCase)* a3:(w default w InlineAssemblyBlock)?
+     { ASTNodeInfo info = NodeUtil.makeASTNodeInfo(createSpan(yyStart,yyCount));
+       scala.collection.immutable.List<AssemblyCase> cases;
+       if (a2s == null) cases = nilACs;
+       else             cases = toList(a2s.list());
+       scala.collection.immutable.List<AssemblyItem> defB;
+       if (a3 == null) defB = nilAIs;
+       else            defB = toList(a3);
+       yyValue = new AssemblySwitch(info, a1, cases, defB);
+     }
+   / function w a1:Id w openparen a2:(w IdList)? w closeparen
+     (w "->" (w openparen)? w Id (w closeparen)?)? w a3:InlineAssemblyBlock
+     { ASTNodeInfo info = NodeUtil.makeASTNodeInfo(createSpan(yyStart,yyCount));
+       Option<Id> param;
+       if (a2 == null) param = Option.<Id>apply(null);
+       else            param = Some.<Id>apply(a2.get(0));
+       yyValue = new AssemblyFtn(info, a1, param, toList(a3));
+     }
+   / for w a1:InlineAssemblyBlock w a2:AssemblyExpression w a3:InlineAssemblyBlock w a4:InlineAssemblyBlock
+     { ASTNodeInfo info = NodeUtil.makeASTNodeInfo(createSpan(yyStart,yyCount));
+       yyValue = new AssemblyFor(info, toList(a1), a2, toList(a3), toList(a4));
+     }
+   / for w a1:InlineAssemblyBlock w a2:AssemblyExpression w a3:AssemblyExpression w a4:InlineAssemblyBlock
+     { ASTNodeInfo info = NodeUtil.makeASTNodeInfo(createSpan(yyStart,yyCount));
+       yyValue = new AssemblyFor(info, toList(a1), a2, toList(list(new AssemblyExprStmt(info, a3))), toList(a4));
+     }
+   / for w a1:AssemblyExpression w a2:AssemblyExpression w a3:InlineAssemblyBlock w a4:InlineAssemblyBlock
+     { ASTNodeInfo info = NodeUtil.makeASTNodeInfo(createSpan(yyStart,yyCount));
+       yyValue = new AssemblyFor(info, toList(list(new AssemblyExprStmt(info, a1))), a2, toList(a3), toList(a4));
+     }
+   / for w a1:AssemblyExpression w a2:AssemblyExpression w a3:AssemblyExpression w a4:InlineAssemblyBlock
+     { ASTNodeInfo info = NodeUtil.makeASTNodeInfo(createSpan(yyStart,yyCount));
+       yyValue = new AssemblyFor(info, toList(list(new AssemblyExprStmt(info, a1))),
+                                 a2, toList(list(new AssemblyExprStmt(info, a3))), toList(a4));
+     }
+   / a1:Id w ":" w "=" w a2:AssemblyExpression
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyAssignX(NodeUtil.makeASTNodeInfo(span), a1, a2);
+     }
+   / a1:Id w ":" w "=" w a2:FunctionalAssemblyExpression
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyAssign(NodeUtil.makeASTNodeInfo(span), a1,
+                                    Some.<FtnAssembly>apply(a2));
+     }
+   / "=:" w a1:Id
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyAssign(NodeUtil.makeASTNodeInfo(span), a1,
+                                    Option.<FtnAssembly>apply(null));
+     }
+   / a1:Id w colon
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyLabel(NodeUtil.makeASTNodeInfo(span), a1);
+     }
+   / a1:NumberLiteral
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyNumber(NodeUtil.makeASTNodeInfo(span), a1);
+     }
+   / a1:HexLiteral
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyNumber(NodeUtil.makeASTNodeInfo(span), a1);
+     }
+   / a1:StringLiteral
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyString(NodeUtil.makeASTNodeInfo(span), a1);
+     }
+   / break
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyBreak(NodeUtil.makeASTNodeInfo(span));
+     }
+   / continue
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyContinue(NodeUtil.makeASTNodeInfo(span));
+     }
+   / assembly w a1:Id w a2:InlineAssemblyBlock
+     { Span span = createSpan(yyStart,yyCount+1);
+       yyValue = new SubAssembly(NodeUtil.makeASTNodeInfo(span), a1, toList(a2));
+     }
+   / yyValue:AssemblyExpression
+   / yyValue:FunctionalAssemblyExpression
+   / a1:Id
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyId(NodeUtil.makeASTNodeInfo(span), a1);
+     }
+   ;
+
+/*
+ * AssemblyCase ::= case w AssemblyExpression w AssemblyBlock
+ */
+AssemblyCase AssemblyCase =
+     case w a1:AssemblyExpression w a2:InlineAssemblyBlock
+     { Span span = createSpan(yyStart,yyCount+1);
+       yyValue = new AssemblyCase(NodeUtil.makeASTNodeInfo(span), a1, toList(a2));
+     };
+
+/*
+ * AssemblyExpression ::=
+ *   Id w openparen (w AssemblyExpressionList)? w closeparen
+ * | Id
+ * | NumberLiteral
+ * | HexLiteral
+ * | StringLiteral
+ */
+AssemblyExpression AssemblyExpression =
+     a1:Id w openparen w a2:AssemblyExpressionList w closeparen
+     { Span span = createSpan(yyStart,yyCount+1);
+       yyValue = new AssemblyCall(NodeUtil.makeASTNodeInfo(span), a1, toList(a2));
+     }
+   / a1:Id w openparen w closeparen
+     { Span span = createSpan(yyStart,yyCount+1);
+       yyValue = new AssemblyCall(NodeUtil.makeASTNodeInfo(span), a1, nilAEs);
+     }
+   / a1:Id
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyId(NodeUtil.makeASTNodeInfo(span), a1);
+     }
+   / a1:NumberLiteral
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyNumber(NodeUtil.makeASTNodeInfo(span), a1);
+     }
+   / a1:HexLiteral
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyNumber(NodeUtil.makeASTNodeInfo(span), a1);
+     }
+   / a1:StringLiteral
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new AssemblyString(NodeUtil.makeASTNodeInfo(span), a1);
+     }
+   ;
+
+/*
+ * AssemblyExpressionList ::=
+ *   AssemblyExpression (w comma w AssemblyExpression)*
+ */
+List<AssemblyExpression> AssemblyExpressionList =
+     a1:AssemblyExpression a2s:(w void:comma w AssemblyExpression)*
+     { yyValue = cons(a1, a2s.list()); };
+
+/*
+ * FunctionalAssemblyExpression ::=
+ *   Id w openparen (w AssemblyItemList)? w closeparen
+ * | EXTENSION: Id
+ */
+FtnAssembly FunctionalAssemblyExpression =
+     a1:Id w openparen a2:(w AssemblyItemList)? w closeparen
+     { Span span = createSpan(yyStart,yyCount);
+       scala.collection.immutable.List<AssemblyItem> ais;
+       if (a2 == null) ais = nilAIs;
+       else            ais = toList(a2);
+       yyValue = new FtnAssembly(NodeUtil.makeASTNodeInfo(span), a1, ais);
+     }
+   / a1:Id
+     { Span span = createSpan(yyStart,yyCount);
+       yyValue = new FtnAssembly(NodeUtil.makeASTNodeInfo(span), a1, nilAIs);
+     };
+
+/*
+ * AssemblyItemList ::= AssemblyItem (w comma w AssemblyItem)*
+ */
+List<AssemblyItem> AssemblyItemList =
+     a1:AssemblyItem a2s:(w void:comma w AssemblyItem)*
+     { yyValue = cons(a1, a2s.list()); };
