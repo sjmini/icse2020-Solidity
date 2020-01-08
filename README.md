@@ -34,34 +34,21 @@ run inhCheck start
 ```
 
 ### Result 
-Misuse of constructors
-result_constructor.txt
-
-Functions without visibility
-result_fv.txt
-
-Storage variable shadowing confusion 
-result_shadow.txt
-
-Type casting to arbitrary contracts 
-type_result_object.txt
-
-Inheritance order confusion 
-result_order.txt
-
-Uninitialized storage pointers
-result_usp.txt
-
-Typo of the += operator
-result_unary.txt
-
-Use of deprecated functions
-result_throw.txt = Throw API
-result_sucide.txt = sucide API
-result_block.txt = block.blockhash API
-result_callcode.txt = callcode API
-result_sha3.txt = sha3 API
-result_gas.txt = msg.gas API
+| Vulnerability | Result File | 
+|---|:---:|
+| `Misuse of constructors` | result_constructor.txt | 
+| `Functions without visibility` | result_fv.txt |  
+| `Storage variable shadowing confusion` | result_shadow.txt |  
+| `Type casting to arbitrary contracts` | type_result_object.txt | 
+| `Inheritance order confusion` | result_order.txt | 
+| `Uninitialized storage pointers` | result_usp.txt | 
+| `Typo of the += operator` | result_unary.txt | 
+| `Deprecated Throw API` | result_throw.txt | 
+| `Deprecated Sucide API` | result_sucide.txt | 
+| `Deprecated block.blockhash API` | result_block.txt | 
+| `Deprecated callcode API` | result_callcode.txt | 
+| `Deprecated sha3 API` | result_sha3.txt | 
+| `Deprecated msg.gas API` | result_gas.txt | 
 
 
 Copyright (c) 2020, KAIST
