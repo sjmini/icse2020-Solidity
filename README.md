@@ -5,7 +5,7 @@
 
 ### Prerequisites
 
-* sbt
+* sbt version 1.2.0
 * Java
 
 Contact author Sungjae Hwang (sjhwang87@kaist.ac.kr) to obtain contracts used in the paper, and place contracts in the test folder in root directory.
