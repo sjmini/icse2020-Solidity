@@ -11,7 +11,7 @@ This repository provides the tool for the paper "Gap between Theory and Practice
 
 ### Data Set
 
-To obtain 55,046 contracts used in the paper, please contact the author Sungjae Hwang (sjhwang87@kaist.ac.kr). 
+To obtain 55,046 contracts used in the paper, please contact the author, Sungjae Hwang (sjhwang87@kaist.ac.kr) and Sukyoung Ryu (sryu.cs@kaist.ac.kr). 
 
 
 ### Building & Executing 
