@@ -65,7 +65,7 @@ Instead of running our static analyzer, you can easily implement your own analyz
 To add new analyzer in our framework, follow below steps:
 ```
 1. Add new command for your analyzer in Command.scala and Saf.scala
-2. Implement analyzer code and place it in the phase directory
+2. Implement analyzer code and place it in the ast_checker directory
 3. Implement initialization code and place it in the phase directory
 ```
 
