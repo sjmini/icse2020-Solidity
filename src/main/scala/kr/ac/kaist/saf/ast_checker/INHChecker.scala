@@ -692,7 +692,8 @@ class INHChecker() extends ASTWalker {
             }
 
             if (name != None) {
-              if (target == true && result.isEmpty && comment.isEmpty && name.get.name != "constructor" && !body.isEmpty) {
+              //if (target == true && result.isEmpty && comment.isEmpty && name.get.name != "constructor" && !body.isEmpty) {
+              if (target == true && result.isEmpty && comment.isEmpty && name.get.name != "constructor") {
                 cont.funcs_typo.add(name.get.name + ":None")
               } else if (target == true && result.isEmpty && !comment.isEmpty && name.get.name != "constructor") {
                 cont.funcs_typo.add(name.get.name + ":YES")
