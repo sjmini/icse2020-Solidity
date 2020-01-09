@@ -16,7 +16,7 @@ To obtain 55,046 contracts used in the paper, please contact the author Sungjae 
 
 ### Building & Executing 
 
-1. Enter sbt in the root directory and goes into sbt terminal.
+1. Enter sbt command in the root directory and goes into sbt terminal.
 
 ```
 bash-3.2$ sbt
@@ -55,6 +55,43 @@ run inhCheck start
 | `Deprecated callcode API` | result_callcode.txt | 
 | `Deprecated sha3 API` | result_sha3.txt | 
 | `Deprecated msg.gas API` | result_gas.txt | 
+
+## Adding New Checker
+
+Our framework parses Solidity contracts and produce AST.
+
+Instead of running our static analyzer, you can easily implement your own analyzer on top of our framework.
+
+To add new analyzer in our framework, follow below steps:
+```
+1. Add new command for your analyzer in Command.scala and Saf.scala
+2. Implement initialization code and place it in the phase director
+3. Implement initiazation code and place it in the phase director
+```
+
+Reference below 4 files:
+
+```
+src/main/scala/kr/ac/kaist/saf/phase/InhCheck.scala
+src/main/scala/kr/ac/kaist/saf/ast_checker/INHChecker.scala
+src/main/scala/kr/ac/kaist/saf/Command.scala
+src/main/scala/kr/ac/kaist/saf/Saf.scale
+```
+
+## New CVEs
+
+Using our tool, we found hundreds of vulnerable contracts and received eight new CVEs.
+
+| CVE Number | Vulnerability | 
+|---|:---:|
+| `CVE-2019-15078` | Misuse of constructors | 
+| `CVE-2019-15079` | Misuse of constructors |
+| `CVE-2019-15080` | Misuse of constructors |
+| `CVE-2019-18775` | Misuse of constructors |
+| `CVE-2019-18776` | Uninitialize Storage Pointer |
+| `CVE-2019-18777` | Type casting to arbitrary contracts |
+| `CVE-2019-18778` | Storage variable shadowing confusion |
+| `CVE-2019-18779` | Function without visibility |
 
 
 ## Publication
