@@ -5,8 +5,16 @@
 
 ### Prerequisites
 
-* sbt
-* Java
+* sbt version 1.2.0
+* Java version 1.8
+* Scala version 2.12.3
+
+Contact author Sungjae Hwang (sjhwang87@kaist.ac.kr) to obtain contracts used in the paper, and place contracts in the test folder in root directory.
+
+Check src/main/scala/kr/ac/kaist/saf/phase/InhCheck.scala : line 50 to 57.
+
+To analyze contracts placed in other directories, change the file locations specified on line 50~57
+
 
 ### Building & Executing 
 
