@@ -1,7 +1,7 @@
-# icse_tool
+# Smart Contract Analyzer
+This repository provides the tool for the paper "Gap between Theory and Practice : An Empirical Study of Security Patches in Solidity" accepted at ICSE 2020.
 
-
-## Static Analyzer Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -9,11 +9,9 @@
 * Java version 1.8
 * Scala version 2.12.3
 
-Contact author Sungjae Hwang (sjhwang87@kaist.ac.kr) to obtain contracts used in the paper, and place contracts in the test folder in root directory.
+### Data Set
 
-Check src/main/scala/kr/ac/kaist/saf/phase/InhCheck.scala : line 50 to 57.
-
-To analyze contracts placed in other directories, change the file locations specified on line 50~57
+To obtain 55,046 contracts used for the evaluation in the paper, please contact the author Sungjae Hwang (sjhwang87@kaist.ac.kr). You need these contracts to reproduce the evaluation result shown in the paper.
 
 
 ### Building & Executing 
@@ -58,5 +56,17 @@ run inhCheck start
 | `Deprecated sha3 API` | result_sha3.txt | 
 | `Deprecated msg.gas API` | result_gas.txt | 
 
+
+## Publication
+```
+Gap between Theory and Practice : An Empirical Study of Security Patches in Solidity. IEEE/ACM 42nd International Conference on Software Engineering, Seoul, South Korea, 23-29 May 2020.
+
+@inproceedings{Hwang2020soliditypatch,
+  title={Gap between Theory and Practice : An Empirical Study of Security Patches in Solidity},
+  author={Sungjae Hwang, Sukyoung Ryu},
+  booktitle={Proceedings of the 42nd International Conference on Software Engineering},
+  year={2020}
+}
+```
 
 Copyright (c) 2020, KAIST
