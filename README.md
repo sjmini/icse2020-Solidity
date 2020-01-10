@@ -1,4 +1,4 @@
-# Smart Contract Analyzer
+# Smart Contract Analyzer [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3603544.svg)](https://doi.org/10.5281/zenodo.3603544)
 This repository provides the tool for the paper "Gap between Theory and Practice : An Empirical Study of Security Patches in Solidity" accepted at ICSE 2020.
 
 ## Getting Started
