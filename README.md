@@ -5,7 +5,7 @@ This repository provides the tool for the paper "Gap between Theory and Practice
 
 ### Prerequisites
 
-* sbt version 1.2.0
+* sbt version 0.13 or later
 * Java version 1.8
 * Scala version 2.12.3
 
