@@ -9,6 +9,7 @@
 #    This distribution may include materials developed by third parties.
 ################################################################################
 
+export SAF_HOME=`pwd`
 export WKSPACE=$SAF_HOME
 
 cd $WKSPACE
@@ -19,7 +20,7 @@ strdiff() {
   return 1
 }
 
-for dir in $WKSPACE/src $WKSPACE/tests
+for dir in $WKSPACE/src
 do
   cd $dir
   files_2018_java=`find $dir -name "*.java" -newer ../timestamp -print`
