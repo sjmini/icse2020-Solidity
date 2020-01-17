@@ -79,5 +79,8 @@ case object CmdAstCheck extends CommandObj("astCheck", CmdParse >> AstCheck)
 // inhCheck
 case object CmdInhCheck extends CommandObj("inhCheck", CmdBase >> InhCheck)
 
+// runTest
+case object CmdRunTest extends CommandObj("runTest", CmdParse >> RunTest)
+
 // help
 case object CmdHelp extends CommandObj("help", CmdBase >> Help)

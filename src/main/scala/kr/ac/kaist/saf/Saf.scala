@@ -76,6 +76,7 @@ object Saf {
     CmdClone,
     CmdAstCheck,
     CmdInhCheck,
+    CmdRunTest,
     CmdHelp
   )
   val cmdMap = commands.foldLeft[Map[String, Command]](HashMap()) {
@@ -88,6 +89,7 @@ object Saf {
     Clone,
     AstCheck,
     InhCheck,
+    RunTest,
     Help
   )
 

@@ -304,7 +304,23 @@ class INHChecker() extends ASTWalker {
     setEnv.set(node)
     walk(node)
     if (mode == 1) {
-      //do nothing
+      if (!final_string_depre_callcode.isEmpty)
+        final_string += final_string_depre_callcode
+
+      if (!final_string_depre_sha3.isEmpty)
+        final_string += final_string_depre_sha3
+
+      if (!final_string_depre_sucide.isEmpty)
+        final_string += final_string_depre_sucide
+
+      if (!final_string_depre_block.isEmpty)
+        final_string += final_string_depre_block
+
+      if (!final_string_depre_gas.isEmpty)
+        final_string += final_string_depre_gas
+
+      if (!final_string_depre_throw.isEmpty)
+        final_string += final_string_depre_throw
     } //throw
     else if (mode == 2) {
       final_string = final_string_depre_throw
