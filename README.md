@@ -39,7 +39,7 @@ bash-3.2$ sbt
 
 4. To execute the static analzer enter the following command
 
-command structure : run command_Name target_file 
+command structure : run command_name target_file 
 
 ```
 run runTest test/test.sol
@@ -47,9 +47,49 @@ run runTest test/test.sol
 
 5. Result 
 
-test_result.txt
+result of analyzer will be summarized in <i>test_result.txt</i> file
+
 ```
+Analyzed : test/test.sol
+
+Detail Information
+
+Uninitialized storage pointer
+USP || [Test -> usp -> un_storage] 
+=> Above means :  Uninitialized storage pointer due to un_storage in usp function of Test contract.
+
+Function without visibility
+PFWMSVM || [Test -> fv]
+=> Above means :  Function without visibility due to fv function in Test contract
+
+Inheritance order confusion
+ORD -> class :Test Function: order!uint contract: D,C
+=> Above means :  Inheritance order confusion due to order(uint) function in both contract D and C
+
+Typo of the += operator
+UNT: -> contract: Test Unary TypoList(u)
+=> Above means :  Typo of the += operator due to usage of =+ in Test contract while udating u variable.
+
+Storage variable shadowing confusion
+DSV: -> contract: Test variable_hidingList(a)
+=> Above means :  Storage variable shadowing confusion due to storage a in Test contract
+
+Misuse of constructor
+COT: -> contract: Test Constructor Typo test lev: 0.1 hold: 0.8 Comment: Yes
+=> Above means :  Misuse of constructor due to test in Test contract
+
+Type casting to arbitrary contracts
+VCP: downcasting inner function ASTNodeInfo(test/test.sol:63:15-19)!B, outer function A
+=> Above means :  Type casting to arbitrary contracts due to downcasting in line 63
+
+Usage of Deprecated API
+DEP: -> contract: Test deprecated blockhash
+DEP: -> contract: Test msg gas
+DEP: -> contract: Test deprecated throw
+=> Above means :  Usage of Deprecated API due to blockhash, msg.gas, throw
 ```
+
+The detailed information of each vulnerability can be found in the paper.
 
 
 ## Adding New Checker
