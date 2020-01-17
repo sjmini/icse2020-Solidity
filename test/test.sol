@@ -48,7 +48,7 @@ contract Test is A, B, C, D{
     
     function deprecatedAPI() public {
         b = msg.gas; //****Detect**** usage of msg.gas deprecated deprecated API
-        var c = block.blockhash; //****Detect**** usage of block.blockhash deprecated API
+	bytes32 blockx = block.blockhash(block.number.sub(1)); //****Detect**** usage of block.blockhash deprecated API
         throw; //****Detect**** usage of throw deprecated API
     }
     
