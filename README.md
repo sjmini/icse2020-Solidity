@@ -14,7 +14,11 @@ This repository provides the tool for the paper "Gap between Theory and Practice
 To obtain 55,046 contracts used in the paper, please contact the author, Sungjae Hwang (sjhwang87@kaist.ac.kr) and Sukyoung Ryu (sryu.cs@kaist.ac.kr). 
 
 
-### Building & Executing 
+### Building & Executing Test
+
+The input to the tool is smart contract written in Solidity programming language.
+
+The test contract (test.sol) is placed in test directory
 
 1. Enter sbt command in the root directory and goes into sbt terminal.
 
@@ -35,26 +39,18 @@ bash-3.2$ sbt
 
 4. To execute the static analzer enter the following command
 
+command structure : run command_Name target_file 
+
 ```
-run inhCheck start
+run runTest test/test.sol
 ```
 
-### Result 
-| Vulnerability | Result File | 
-|---|:---:|
-| `Misuse of constructors` | result_constructor.txt | 
-| `Functions without visibility` | result_fv.txt |  
-| `Storage variable shadowing confusion` | result_shadow.txt |  
-| `Type casting to arbitrary contracts` | type_result_object.txt | 
-| `Inheritance order confusion` | result_order.txt | 
-| `Uninitialized storage pointers` | result_usp.txt | 
-| `Typo of the += operator` | result_unary.txt | 
-| `Deprecated Throw API` | result_throw.txt | 
-| `Deprecated Sucide API` | result_sucide.txt | 
-| `Deprecated block.blockhash API` | result_block.txt | 
-| `Deprecated callcode API` | result_callcode.txt | 
-| `Deprecated sha3 API` | result_sha3.txt | 
-| `Deprecated msg.gas API` | result_gas.txt | 
+5. Result 
+
+test_result.txt
+```
+```
+
 
 ## Adding New Checker
 
